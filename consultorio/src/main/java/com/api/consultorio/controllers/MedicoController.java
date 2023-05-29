@@ -1,6 +1,7 @@
 package com.api.consultorio.controllers;
 
 import com.api.consultorio.dtos.MedicoDTO;
+import com.api.consultorio.dtos.MedicoListDTO;
 import com.api.consultorio.services.MedicoService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -22,7 +23,7 @@ public class MedicoController {
         return medicoService.cadastrar(medicoDTO, uriBuilder);
     }
     @GetMapping
-    public List<MedicoDTO> listar(@RequestParam(required = false) String nome){
+    public List<MedicoListDTO> listar(@RequestParam(required = false) String nome){
         return medicoService.listar(nome);
     }
 

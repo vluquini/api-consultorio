@@ -2,7 +2,8 @@
 <project version="4">
   <component name="ProjectModuleManager">
     <modules>
-      <module fileurl="file://$PROJECT_DIR$/.idea/consultorio.iml" filepath="$PROJECT_DIR$/.idea/consultorio.iml" />
+      <module fileurl="file://$PROJECT_DIR$/.idea/api-consultorio.iml" filepath="$PROJECT_DIR$/.idea/api-consultorio.iml" />
+      <module fileurl="file://$PROJECT_DIR$/consultorio/consultorio.iml" filepath="$PROJECT_DIR$/consultorio/consultorio.iml" />
     </modules>
   </component>
 </project>
