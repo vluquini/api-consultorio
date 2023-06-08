@@ -31,16 +31,21 @@ public class MedicoService {
     }
 
     // este método retorna apenas os dados necessários dos médicos, usando a classe "MedicoResponseDTO".
-    public List<MedicoListDTO> listar(String nome) {
+    public List<MedicoListDTO> listar() {
+        /*
         if (nome != null && !(nome.equalsIgnoreCase(""))) {
             // retorna os elementos que possuirem o mesmo nome
             return medicoRepository.findAll().stream()
-                    .filter(medico -> medico.getNome().equalsIgnoreCase(nome))
+                    .filter(medico -> medico.getNome().equalsIgnoreCase(nome) && medico.isAtivo() == true)
                     .map(MedicoListDTO::new)
                     .toList();
         }
+        */
         // retorna todos os elementos ordenados pelo nome
-        return medicoRepository.findAll().stream().sorted((m1, m2) -> m1.getNome()
+        return medicoRepository.findAll().stream()
+                // filtra apenas os médicos "ativos"
+                .filter(medico -> medico.isAtivo() == true)
+                .sorted((m1, m2) -> m1.getNome()
                 .compareToIgnoreCase(m2.getNome())).map(MedicoListDTO::new).toList();
     }
 
@@ -49,6 +54,7 @@ public class MedicoService {
     os demais parâmetros que possam ser passados na requisição.
     Isto evita a necessidade de criar novas classes DTOs.
      */
+
     public ResponseEntity<MedicoDTO> atualizar(Long id, MedicoDTO medicoDTO){
         Optional<Medico> optionalMedico = medicoRepository.findById(id);
         // se existir um medico com o id passado, realiza a atualização
@@ -66,27 +72,30 @@ public class MedicoService {
                     medicoUpdated.getEmail(),
                     medicoUpdated.getTelefone(),
                     medicoUpdated.getCrm(),
-                    medicoUpdated.getEspecialidade()),
+                    medicoUpdated.getEspecialidade(),
+                    medicoUpdated.isAtivo()),
                     HttpStatus.OK);
          }
         return new ResponseEntity<>(HttpStatus.NOT_FOUND);
     }
 
-    /*
+    // método responsável por alterar o atibuto "ativo" dos métodos. não apaga do banco.
     public ResponseEntity<MedicoDTO> apagar(Long id){
         Optional<Medico> optionalMedico = medicoRepository.findById(id);
 
         if(optionalMedico.isPresent()){
             Medico medico = optionalMedico.get();
+            // seta status do medico para "inativo"
+            medico.setAtivo(false);
             ResponseEntity<MedicoDTO> response = new ResponseEntity<MedicoDTO>(new MedicoDTO(
                     medico.getId(), medico.getNome(), medico.getEmail(), medico.getTelefone(), medico.getCrm(),
-                    medico.getEspecialidade()), HttpStatus.OK);
-
-            medicoRepository.deleteById(id);
+                    medico.getEspecialidade(), medico.isAtivo()), HttpStatus.OK);
+            // salvo a nova instância atualizada
+            medicoRepository.save(medico);
             return response;
         }
         return new ResponseEntity<>(HttpStatus.NOT_FOUND);
     }
-    */
+
 
 }

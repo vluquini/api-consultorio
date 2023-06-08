@@ -24,11 +24,16 @@ public class MedicoController {
     }
     @GetMapping
     public List<MedicoListDTO> listar(@RequestParam(required = false) String nome){
-        return medicoService.listar(nome);
+        return medicoService.listar();
     }
 
     @PutMapping("/{id}")
     public ResponseEntity<MedicoDTO> atualizar(@PathVariable Long id, @RequestBody MedicoDTO medicoDTO){
         return medicoService.atualizar(id, medicoDTO);
+    }
+
+    @DeleteMapping("/{id}")
+    public ResponseEntity<MedicoDTO> apagar(@PathVariable Long id){
+        return medicoService.apagar(id);
     }
 }

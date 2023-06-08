@@ -28,6 +28,9 @@ public class Medico {
     @Enumerated(value = EnumType.STRING)
     @NotNull
     private Especialidade especialidade;
+    @NotNull
+    private boolean ativo;
+
 
     public Medico(MedicoDTO medicoDTO) {
         this.id = medicoDTO.id();
@@ -36,5 +39,6 @@ public class Medico {
         this.telefone = medicoDTO.telefone();
         this.crm = medicoDTO.crm();
         this.especialidade = medicoDTO.especialidade();
+        this.ativo = true;
     }
 }

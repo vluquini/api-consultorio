@@ -8,10 +8,12 @@ public record PacienteDTO(
         @NotNull String nome,
         @NotNull String email,
         @NotNull String telefone,
-        @NotNull String cpf
+        @NotNull String cpf,
+        @NotNull
+        boolean ativo
 ) {
     public PacienteDTO(Paciente paciente){
         this(paciente.getId(), paciente.getNome(), paciente.getEmail(), paciente.getTelefone(),
-                paciente.getCpf());
+                paciente.getCpf(), paciente.isAtivo());
     }
 }
