@@ -31,6 +31,7 @@ public class Paciente {
         this.email = pacienteDTO.email();
         this.telefone = pacienteDTO.telefone();
         this.cpf = pacienteDTO.cpf();
+        this.endereco = pacienteDTO.endereco();
         this.ativo = true;
     }
 }
