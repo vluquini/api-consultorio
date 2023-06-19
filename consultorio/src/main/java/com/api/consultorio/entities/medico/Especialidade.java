@@ -1,4 +1,4 @@
-package com.api.consultorio.entities;
+package com.api.consultorio.entities.medico;
 
 public enum Especialidade {
     ORTOPEDIA,

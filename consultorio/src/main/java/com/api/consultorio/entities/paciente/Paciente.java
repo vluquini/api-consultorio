@@ -1,13 +1,8 @@
-package com.api.consultorio.entities;
+package com.api.consultorio.entities.paciente;
 
-import com.api.consultorio.dtos.MedicoDTO;
 import com.api.consultorio.dtos.PacienteDTO;
-import jakarta.persistence.Entity;
-import jakarta.persistence.GeneratedValue;
-import jakarta.persistence.GenerationType;
-import jakarta.persistence.Id;
-import jakarta.validation.constraints.NotBlank;
-import jakarta.validation.constraints.NotNull;
+import com.api.consultorio.entities.Endereco;
+import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -22,16 +17,13 @@ public class Paciente {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
-    @NotNull
     private String nome;
-    @NotNull
     private String email;
-    @NotNull
     private String telefone;
-    @NotNull
     private String cpf;
-    @NotNull
-    boolean ativo;
+    @Embedded
+    Endereco endereco;
+    Boolean ativo;
 
     public Paciente(PacienteDTO pacienteDTO) {
         this.id = pacienteDTO.id();

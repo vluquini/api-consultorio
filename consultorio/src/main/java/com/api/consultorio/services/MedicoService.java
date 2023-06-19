@@ -2,7 +2,7 @@ package com.api.consultorio.services;
 
 import com.api.consultorio.dtos.MedicoDTO;
 import com.api.consultorio.dtos.MedicoListDTO;
-import com.api.consultorio.entities.Medico;
+import com.api.consultorio.entities.medico.Medico;
 import com.api.consultorio.repositories.MedicoRepository;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -20,10 +20,8 @@ public class MedicoService {
     @Autowired
     MedicoRepository medicoRepository;
 
-    // para cadastrar um novo medico, todos os dados devem ser preenchidos na requisição.
+    // para cadastrar um novo medico, todos os dados devem ser preenchidos na requisição
     public ResponseEntity<MedicoDTO> cadastrar(MedicoDTO medicoDTO, UriComponentsBuilder uriBuilder){
-        // Verifica se há algum campo nulo no objeto medicoDTO passado no parâmetro
-
         Medico medico = new Medico(medicoDTO);
         URI uri = uriBuilder.path("/medicos/{id}").buildAndExpand(medico.getId()).toUri();
         medicoRepository.save(medico);
@@ -44,7 +42,7 @@ public class MedicoService {
         // retorna todos os elementos ordenados pelo nome
         return medicoRepository.findAll().stream()
                 // filtra apenas os médicos "ativos"
-                .filter(medico -> medico.isAtivo() == true)
+                .filter(medico -> medico.getAtivo() == true)
                 .sorted((m1, m2) -> m1.getNome()
                 .compareToIgnoreCase(m2.getNome())).map(MedicoListDTO::new).toList();
     }
@@ -73,7 +71,8 @@ public class MedicoService {
                     medicoUpdated.getTelefone(),
                     medicoUpdated.getCrm(),
                     medicoUpdated.getEspecialidade(),
-                    medicoUpdated.isAtivo()),
+                    medicoUpdated.getEndereco(),
+                    medicoUpdated.getAtivo()),
                     HttpStatus.OK);
          }
         return new ResponseEntity<>(HttpStatus.NOT_FOUND);
@@ -89,7 +88,7 @@ public class MedicoService {
             medico.setAtivo(false);
             ResponseEntity<MedicoDTO> response = new ResponseEntity<MedicoDTO>(new MedicoDTO(
                     medico.getId(), medico.getNome(), medico.getEmail(), medico.getTelefone(), medico.getCrm(),
-                    medico.getEspecialidade(), medico.isAtivo()), HttpStatus.OK);
+                    medico.getEspecialidade(), medico.getEndereco(), medico.getAtivo()), HttpStatus.OK);
             // salvo a nova instância atualizada
             medicoRepository.save(medico);
             return response;

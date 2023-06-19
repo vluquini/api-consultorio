@@ -1,20 +1,24 @@
 package com.api.consultorio.dtos;
 
-import com.api.consultorio.entities.Especialidade;
-import com.api.consultorio.entities.Medico;
+import com.api.consultorio.entities.Endereco;
+import com.api.consultorio.entities.medico.Especialidade;
+import com.api.consultorio.entities.medico.Medico;
+import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
 
 public record MedicoDTO(
         Long id,
-         @NotNull String nome,
-         @NotNull String email,
-         @NotNull String telefone,
-         @NotNull String crm,
-         @NotNull Especialidade especialidade,
-        @NotNull boolean ativo
+        @NotBlank String nome,
+        @NotBlank String email,
+        @NotBlank String telefone,
+        @NotBlank String crm,
+        @NotBlank Especialidade especialidade,
+        @NotBlank Endereco endereco,
+        @NotBlank Boolean ativo
 ) {
     public MedicoDTO(Medico medico){
         this(medico.getId(), medico.getNome(), medico.getEmail(),
-                medico.getTelefone(), medico.getCrm(), medico.getEspecialidade(), medico.isAtivo());
+                medico.getTelefone(), medico.getCrm(), medico.getEspecialidade(), medico.getEndereco(),
+                medico.getAtivo());
     }
 }

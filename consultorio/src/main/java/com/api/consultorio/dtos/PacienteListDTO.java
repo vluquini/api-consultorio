@@ -1,14 +1,14 @@
 package com.api.consultorio.dtos;
 
-import com.api.consultorio.entities.Paciente;
+import com.api.consultorio.entities.paciente.Paciente;
 
 public record PacienteListDTO(
         String nome,
         String email,
         String cpf,
-        boolean ativo
+        Boolean ativo
 ) {
     public PacienteListDTO(Paciente paciente){
-        this(paciente.getNome(), paciente.getEmail(), paciente.getCpf(),paciente.isAtivo());
+        this(paciente.getNome(), paciente.getEmail(), paciente.getCpf(),paciente.getAtivo());
     }
 }

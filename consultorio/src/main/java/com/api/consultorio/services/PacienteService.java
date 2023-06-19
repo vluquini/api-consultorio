@@ -2,7 +2,7 @@ package com.api.consultorio.services;
 
 import com.api.consultorio.dtos.PacienteDTO;
 import com.api.consultorio.dtos.PacienteListDTO;
-import com.api.consultorio.entities.Paciente;
+import com.api.consultorio.entities.paciente.Paciente;
 import com.api.consultorio.repositories.PacienteRepository;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -22,8 +22,6 @@ public class PacienteService {
     PacienteRepository pacienteRepository;
 
     public ResponseEntity<PacienteDTO> cadastrar(PacienteDTO pacienteDTO, UriComponentsBuilder uriBuilder){
-        // Verifica se há algum campo nulo no objeto medicoDTO passado no parâmetro
-
         Paciente paciente = new Paciente(pacienteDTO);
         URI uri = uriBuilder.path("/medicos/{id}").buildAndExpand(paciente.getId()).toUri();
         pacienteRepository.save(paciente);
@@ -31,13 +29,12 @@ public class PacienteService {
     }
 
     public List<PacienteListDTO> listar() {
-
         // retorna todos os elementos ordenados pelo nome
         return pacienteRepository.findAll().stream()
                 // filtra apenas os médicos "ativos"
-                .filter(Paciente::isAtivo)
+                .filter(Paciente::getAtivo)
                 .sorted((m1, m2) -> m1.getNome()
-                        .compareToIgnoreCase(m2.getNome())).map(PacienteListDTO::new).toList();
+                .compareToIgnoreCase(m2.getNome())).map(PacienteListDTO::new).toList();
     }
 
     public ResponseEntity<PacienteDTO> atualizar(Long id, PacienteDTO medicoDTO){
@@ -57,7 +54,8 @@ public class PacienteService {
                     pacienteUpdated.getEmail(),
                     pacienteUpdated.getTelefone(),
                     pacienteUpdated.getCpf(),
-                    pacienteUpdated.isAtivo()),
+                    pacienteUpdated.getEndereco(),
+                    pacienteUpdated.getAtivo()),
                     HttpStatus.OK);
         }
         return new ResponseEntity<>(HttpStatus.NOT_FOUND);
@@ -72,7 +70,7 @@ public class PacienteService {
             paciente.setAtivo(false);
             ResponseEntity<PacienteDTO> response = new ResponseEntity<>(new PacienteDTO(
                     paciente.getId(), paciente.getNome(), paciente.getEmail(), paciente.getTelefone(),
-                    paciente.getCpf(), paciente.isAtivo()), HttpStatus.OK);
+                    paciente.getCpf(), paciente.getEndereco(), paciente.getAtivo()), HttpStatus.OK);
             // salvo a nova instância atualizada
             pacienteRepository.save(paciente);
             return response;

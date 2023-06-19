@@ -1,19 +1,21 @@
 package com.api.consultorio.dtos;
 
-import com.api.consultorio.entities.Paciente;
+import com.api.consultorio.entities.Endereco;
+import com.api.consultorio.entities.paciente.Paciente;
+import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
 
 public record PacienteDTO(
         Long id,
-        @NotNull String nome,
-        @NotNull String email,
-        @NotNull String telefone,
-        @NotNull String cpf,
-        @NotNull
-        boolean ativo
+        @NotBlank String nome,
+        @NotBlank String email,
+        @NotBlank String telefone,
+        @NotBlank String cpf,
+        @NotBlank Endereco endereco,
+        @NotBlank Boolean ativo
 ) {
     public PacienteDTO(Paciente paciente){
         this(paciente.getId(), paciente.getNome(), paciente.getEmail(), paciente.getTelefone(),
-                paciente.getCpf(), paciente.isAtivo());
+                paciente.getCpf(), paciente.getEndereco(), paciente.getAtivo());
     }
 }

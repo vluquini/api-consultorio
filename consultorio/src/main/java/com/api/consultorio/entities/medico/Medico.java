@@ -1,8 +1,8 @@
-package com.api.consultorio.entities;
+package com.api.consultorio.entities.medico;
 
 import com.api.consultorio.dtos.MedicoDTO;
+import com.api.consultorio.entities.Endereco;
 import jakarta.persistence.*;
-import jakarta.validation.constraints.NotNull;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -17,19 +17,15 @@ public class Medico {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
-    @NotNull
     private String nome;
-    @NotNull
     private String email;
-    @NotNull
     private String telefone;
-    @NotNull
     private String crm;
     @Enumerated(value = EnumType.STRING)
-    @NotNull
     private Especialidade especialidade;
-    @NotNull
-    private boolean ativo;
+    @Embedded
+    private Endereco endereco;
+    private Boolean ativo;
 
 
     public Medico(MedicoDTO medicoDTO) {
@@ -39,6 +35,7 @@ public class Medico {
         this.telefone = medicoDTO.telefone();
         this.crm = medicoDTO.crm();
         this.especialidade = medicoDTO.especialidade();
+        this.endereco = medicoDTO.endereco();
         this.ativo = true;
     }
 }
