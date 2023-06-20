@@ -38,7 +38,4 @@ public class Consulta {
                 consultaDTO.dataHora());
     }
 
-
-
-
 }

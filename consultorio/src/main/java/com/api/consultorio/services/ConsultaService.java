@@ -1,7 +1,9 @@
 package com.api.consultorio.services;
 /*
     Classe responsável por Agendar e Cancelar consultas.
- */
+*/
+import com.api.consultorio.dtos.AgendarConsultaDTO;
+import com.api.consultorio.services.validacoes.ValidacoesDataConsulta;
 import com.api.consultorio.dtos.ConsultaDTO;
 import com.api.consultorio.entities.consulta.Consulta;
 import com.api.consultorio.entities.medico.Medico;
@@ -23,45 +25,78 @@ public class ConsultaService {
     MedicoRepository medicoRepository;
     @Autowired
     PacienteRepository pacienteRepository;
-/*
-    private boolean isDiaUtil(LocalDateTime dataHora) {
-        DayOfWeek diaSemana = dataHora.getDayOfWeek();
-        // verifica se o dia está entre segunda e sábado
-        return !diaSemana.equals(DayOfWeek.SUNDAY) && !diaSemana.equals(DayOfWeek.SATURDAY);
-    }
 
-    private boolean isHorarioPermitido(LocalDateTime dataHora) {
-        LocalTime horario = dataHora.toLocalTime();
-        // verifica se o horário está entre 7h e 19h
-        return horario.isAfter(LocalTime.of(7, 0)) && horario.isBefore(LocalTime.of(19, 0));
-    }
-*/
-
-    public void agendarConsulta(ConsultaDTO consultaDTO) {
+    public void agendarConsulta(ConsultaDTO consultaDTO) throws Exception{
         Optional<Paciente> pacienteOptional = pacienteRepository.findById(consultaDTO.paciente().getId());
         Optional<Medico> medicoOptional = medicoRepository.findById(consultaDTO.medico().getId());
 
-        System.out.println(("Aobaa"));
-        //Consulta consulta = null;
+//        if (!consultaDTO.paciente().getAtivo()){
+//            throw new Exception("Não é possível marcar consultas com pacientes inativos no sistema!");
+//        }
+//        if(!consultaDTO.medico().getAtivo()){
+//            throw new Exception("Não é possível marcar consultas com médicos inativos no sistema!");
+//        }
+        if(!ValidacoesDataConsulta.isDiaUtil(consultaDTO.dataHora())) {
+            System.out.println(consultaDTO.dataHora() + "\nTeste");
+            throw new Exception("Dia inválido! A clínica não funciona aos domingos.");
+        }
+        if(!ValidacoesDataConsulta.isHorarioPermitido(consultaDTO.dataHora())){
+            throw new Exception(("Só é possível marcar consultas entre 7 e 19h!"));
+        }
+        if(!ValidacoesDataConsulta.validarHorarioDeAntecedencia(consultaDTO.dataHora())){
+            throw new Exception("A consulta deve ser marcada com pelo menos 30 minutos de antecedência!");
+        }
+
+//        Medico medico = medicoOptional.get();
+//        Paciente paciente = pacienteOptional.get();
+//        // Verifica se o médico já possui uma consulta agendada na mesma data e horário
+//        if (consultaRepository.existsByMedicoAndDataHora(medico, consultaDTO.dataHora())) {
+//            throw new Exception("O médico já possui uma consulta marcada para esse horário!");
+//        }
+//        // Verifica se o paciente já possui uma consulta agendada na mesma data e horário
+//        if (consultaRepository.existsByPacienteAndDataHora(paciente, consultaDTO.dataHora())) {
+//            throw new Exception("O paciente já possui uma consulta marcada para esse horário!");
+//        }
+
         if (medicoOptional.isPresent() && pacienteOptional.isPresent()) {
             Consulta consulta = new Consulta();
             consulta.setId(consultaDTO.id());
             consulta.setMedico(medicoOptional.get());
             consulta.setPaciente(pacienteOptional.get());
-            consulta.setDataHora(consulta.getDataHora());
-            //consulta.setMotivoCancelamento(consulta.getMotivoCancelamento());
+            consulta.setDataHora(consultaDTO.dataHora());
 
             Consulta consultaAtualizada = consultaRepository.save(consulta);
             System.out.println(("Aobaa"));
         }
-
         System.out.println(("BAOBA"));
-        //return new ConsultaDTO(consultaAtualizada);
     }
 
-    public List<ConsultaDTO> listar() {
+
+    public List<ConsultaDTO> listarConsultas() {
         return consultaRepository.findAll().stream().map(ConsultaDTO::new).toList();
     }
+
+//    public void agendarConsultaTeste(AgendarConsultaDTO agendarConsultaDTO) {
+//        Optional<Paciente> pacienteOptional = pacienteRepository.findById(agendarConsultaDTO.idPaciente());
+//        Optional<Medico> medicoOptional = medicoRepository.findById(agendarConsultaDTO.idMedico());
+//
+//        System.out.println(agendarConsultaDTO.id());
+//        System.out.println(("Aobaa"));
+//        //Consulta consulta = null;
+//        if (medicoOptional.isPresent() && pacienteOptional.isPresent()) {
+//            Consulta consulta = new Consulta();
+//            consulta.setId(agendarConsultaDTO.id());
+//            consulta.setMedico(medicoOptional.get());
+//            consulta.setPaciente(pacienteOptional.get());
+//            consulta.setDataHora(agendarConsultaDTO.dataHora());
+//            //consulta.setMotivoCancelamento(consulta.getMotivoCancelamento());
+//
+//            Consulta consultaAtualizada = consultaRepository.save(consulta);
+//            System.out.println(("Consulta agendada com sucesso!"));
+//        }else
+//            System.out.println(("Deu ruim!"));
+//
+//    }
 
 
 }

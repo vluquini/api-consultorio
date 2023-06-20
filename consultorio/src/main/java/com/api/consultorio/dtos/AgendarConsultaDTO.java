@@ -1,7 +1,6 @@
 package com.api.consultorio.dtos;
 
 import com.api.consultorio.entities.consulta.Consulta;
-import com.api.consultorio.entities.medico.Especialidade;
 import jakarta.validation.constraints.Future;
 import jakarta.validation.constraints.NotBlank;
 

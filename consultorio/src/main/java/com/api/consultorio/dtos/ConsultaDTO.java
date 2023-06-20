@@ -16,6 +16,7 @@ public record ConsultaDTO(
         @NotBlank
         Paciente paciente,
         //@Future // valida data atual com uma posterior
+        @NotBlank
         LocalDateTime dataHora
        //MotivoCancelamento motivoCancelamento
        //Especialidade especialidade
