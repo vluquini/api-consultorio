@@ -13,6 +13,7 @@ import com.api.consultorio.repositories.MedicoRepository;
 import com.api.consultorio.repositories.PacienteRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+
 import java.util.List;
 import java.util.Optional;
 
@@ -29,19 +30,31 @@ public class ConsultaService {
     public void agendarConsulta(ConsultaDTO consultaDTO) throws Exception{
         Optional<Paciente> pacienteOptional = pacienteRepository.findById(consultaDTO.paciente().getId());
         Optional<Medico> medicoOptional = medicoRepository.findById(consultaDTO.medico().getId());
+        ValidacoesDataConsulta validacoesDataConsulta = new ValidacoesDataConsulta();
 
-//        if (!consultaDTO.paciente().getAtivo()){
-//            throw new Exception("Não é possível marcar consultas com pacientes inativos no sistema!");
-//        }
-//        if(!consultaDTO.medico().getAtivo()){
-//            throw new Exception("Não é possível marcar consultas com médicos inativos no sistema!");
-//        }
+        if (!pacienteOptional.get().getAtivo()){
+            throw new Exception("Não é possível marcar consultas com pacientes inativos no sistema!");
+        }
+        if(!medicoOptional.get().getAtivo()){
+            throw new Exception("Não é possível marcar consultas com médicos inativos no sistema!");
+        }
+
+        int i = 0;
+
+
+        if (i >= 1) {
+            validacoesDataConsulta.validarDiaConsultaPaciente(consultaDTO, consultaRepository);
+        }
+        i++;
+
+
+
+
         if(!ValidacoesDataConsulta.isDiaUtil(consultaDTO.dataHora())) {
-            System.out.println(consultaDTO.dataHora() + "\nTeste");
             throw new Exception("Dia inválido! A clínica não funciona aos domingos.");
         }
         if(!ValidacoesDataConsulta.isHorarioPermitido(consultaDTO.dataHora())){
-            throw new Exception(("Só é possível marcar consultas entre 7 e 19h!"));
+            throw new Exception(("Só é possível marcar consultas entre 7h e 19h!"));
         }
         if(!ValidacoesDataConsulta.validarHorarioDeAntecedencia(consultaDTO.dataHora())){
             throw new Exception("A consulta deve ser marcada com pelo menos 30 minutos de antecedência!");
