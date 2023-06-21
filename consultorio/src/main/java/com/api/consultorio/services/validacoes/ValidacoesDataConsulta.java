@@ -1,9 +1,8 @@
 package com.api.consultorio.services.validacoes;
 
 import com.api.consultorio.dtos.ConsultaDTO;
+import com.api.consultorio.dtos.MedicoDTO;
 import com.api.consultorio.entities.consulta.Consulta;
-import com.api.consultorio.entities.medico.Medico;
-import com.api.consultorio.entities.paciente.Paciente;
 import com.api.consultorio.repositories.ConsultaRepository;
 import com.api.consultorio.repositories.MedicoRepository;
 import com.api.consultorio.repositories.PacienteRepository;
@@ -42,22 +41,43 @@ public class ValidacoesDataConsulta {
 
     // nao permite que o paciente marque mais de uma consulta no mesmo dia
     public boolean validarDiaConsultaPaciente(ConsultaDTO consultaDTO, ConsultaRepository consultaRepository){
-        LocalDate diaAtual = LocalDate.now(ZoneId.systemDefault());
+        //LocalDate diaAtual = LocalDate.now(ZoneId.systemDefault());
         List<Consulta> listaConsultas = consultaRepository.findAll();
         int i = 0;
-        //System.out.println(listaConsultas);
         while (listaConsultas != null){
-                System.out.println("Teste");
-                return true;
-
+            if(listaConsultas.get(i).getPaciente().getId() == consultaDTO.paciente().getId()){
+                return listaConsultas.get(i).getDataHora() == consultaDTO.dataHora();
+            }
+            i++;
         }
         return false;
     }
-    /*
-    public List<ConsultaDTO> listarConsultas() {
-        return consultaRepository.findAll().stream().map(ConsultaDTO::new).toList();
+    public boolean validarDiaConsultaMedico(ConsultaDTO consultaDTO, ConsultaRepository consultaRepository){
+        List<Consulta> listaConsultas = consultaRepository.findAll();
+        int i = 0;
+        System.out.println("Teste");
+        while (listaConsultas != null){
+            if(listaConsultas.get(i).getMedico().getId() == consultaDTO.medico().getId()){
+                return listaConsultas.get(i).getDataHora() == consultaDTO.dataHora();
+            }
+            i++;
+        }
+        return false;
     }
-     */
+
+//    public boolean escolherMedicoConsulta(ConsultaDTO consultaDTO, ConsultaRepository consultaRepository){
+//        List<Consulta> listaConsultas = consultaRepository.findAll();
+//        //List<Medico> listaMedicos = medicoRepository.findAll();
+//        int i = 0;
+//        while (listaConsultas != null){
+//            if(listaConsultas.get(i).getMedico().getId() == consultaDTO.medico().getId()){
+//                return listaConsultas.get(i).getDataHora() == consultaDTO.dataHora();
+//            }
+//            i++;
+//        }
+//        return false;
+//    }
+
     /*
     Preciso verificar se há médico no corpo da requisição;
     Se não houver, pesquisasr um médico que esteja "ativo" e esteja

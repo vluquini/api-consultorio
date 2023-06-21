@@ -26,11 +26,18 @@ public class ConsultaService {
     MedicoRepository medicoRepository;
     @Autowired
     PacienteRepository pacienteRepository;
+    int auxiliar = 0;
+    int auxiliar2 = 0;
 
     public void agendarConsulta(ConsultaDTO consultaDTO) throws Exception{
         Optional<Paciente> pacienteOptional = pacienteRepository.findById(consultaDTO.paciente().getId());
         Optional<Medico> medicoOptional = medicoRepository.findById(consultaDTO.medico().getId());
         ValidacoesDataConsulta validacoesDataConsulta = new ValidacoesDataConsulta();
+
+//        if(!validacoesDataConsulta.escolherMedicoConsulta(consultaDTO, consultaRepository)){
+//            throw new Exception("Medico ja tem consulta pra este horário!");
+//        }
+
 
         if (!pacienteOptional.get().getAtivo()){
             throw new Exception("Não é possível marcar consultas com pacientes inativos no sistema!");
@@ -38,18 +45,17 @@ public class ConsultaService {
         if(!medicoOptional.get().getAtivo()){
             throw new Exception("Não é possível marcar consultas com médicos inativos no sistema!");
         }
-
-        int i = 0;
-
-
-        if (i >= 1) {
-            validacoesDataConsulta.validarDiaConsultaPaciente(consultaDTO, consultaRepository);
+        //////////////////////////////////////////////////////////////////////////////
+        if (auxiliar >= 1 && validacoesDataConsulta.validarDiaConsultaPaciente(consultaDTO, consultaRepository)) {
+            throw new Exception("O paciente não pode ter mais de uma consulta no mesmo dia!");
         }
-        i++;
+        auxiliar++;
 
-
-
-
+        if (auxiliar2 >= 1 && validacoesDataConsulta.validarDiaConsultaMedico(consultaDTO, consultaRepository)) {
+            throw new Exception("O médico já possui uma consulta marcada neste horário!");
+        }
+        auxiliar2++;
+        //////////////////////////////////////////////////////////////////////////////
         if(!ValidacoesDataConsulta.isDiaUtil(consultaDTO.dataHora())) {
             throw new Exception("Dia inválido! A clínica não funciona aos domingos.");
         }
@@ -59,17 +65,6 @@ public class ConsultaService {
         if(!ValidacoesDataConsulta.validarHorarioDeAntecedencia(consultaDTO.dataHora())){
             throw new Exception("A consulta deve ser marcada com pelo menos 30 minutos de antecedência!");
         }
-
-//        Medico medico = medicoOptional.get();
-//        Paciente paciente = pacienteOptional.get();
-//        // Verifica se o médico já possui uma consulta agendada na mesma data e horário
-//        if (consultaRepository.existsByMedicoAndDataHora(medico, consultaDTO.dataHora())) {
-//            throw new Exception("O médico já possui uma consulta marcada para esse horário!");
-//        }
-//        // Verifica se o paciente já possui uma consulta agendada na mesma data e horário
-//        if (consultaRepository.existsByPacienteAndDataHora(paciente, consultaDTO.dataHora())) {
-//            throw new Exception("O paciente já possui uma consulta marcada para esse horário!");
-//        }
 
         if (medicoOptional.isPresent() && pacienteOptional.isPresent()) {
             Consulta consulta = new Consulta();
