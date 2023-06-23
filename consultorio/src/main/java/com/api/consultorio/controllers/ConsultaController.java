@@ -1,6 +1,5 @@
 package com.api.consultorio.controllers;
 
-import com.api.consultorio.dtos.AgendarConsultaDTO;
 import com.api.consultorio.dtos.ConsultaDTO;
 import com.api.consultorio.services.ConsultaService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -21,12 +20,8 @@ public class ConsultaController {
     }
 
     @GetMapping
-    public List<ConsultaDTO> listarConsultas(){
+    public List<ConsultaDTO> listarConsultas()throws Exception{
         return consultaService.listarConsultas();
     }
 
-//    @PostMapping
-//    public void agendarConsultaTeste(@RequestBody AgendarConsultaDTO consultaDTO){
-//        consultaService.agendarConsultaTeste(consultaDTO);
-//    }
 }
