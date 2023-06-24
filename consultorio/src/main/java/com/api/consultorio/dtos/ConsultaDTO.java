@@ -7,13 +7,14 @@ import com.api.consultorio.entities.medico.Medico;
 import com.api.consultorio.entities.paciente.Paciente;
 import jakarta.validation.constraints.Future;
 import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.NotNull;
 
 import java.time.LocalDateTime;
 
 public record ConsultaDTO(
         Long id,
         Medico medico,
-        @NotBlank
+        @NotNull
         Paciente paciente,
         @Future // valida data atual com uma posterior
         @NotBlank

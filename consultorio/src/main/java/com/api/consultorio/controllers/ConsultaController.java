@@ -5,8 +5,10 @@ import com.api.consultorio.entities.consulta.Consulta;
 import com.api.consultorio.entities.consulta.MotivoCancelamento;
 import com.api.consultorio.services.ConsultaService;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.util.UriComponentsBuilder;
 
 import java.util.List;
 
@@ -17,13 +19,15 @@ public class ConsultaController {
     private ConsultaService consultaService;
 
     @PostMapping
-    public void agendarConsulta(@RequestBody ConsultaDTO consultaDTO) throws Exception {
-         consultaService.agendarConsulta(consultaDTO);
+    @ResponseStatus(HttpStatus.CREATED)
+    public ResponseEntity<ConsultaDTO> agendarConsulta(@RequestBody ConsultaDTO consultaDTO,
+                                                       UriComponentsBuilder uriBuilder) throws Exception {
+         return consultaService.agendarConsulta(consultaDTO, uriBuilder);
 
     }
 
     @DeleteMapping("/{id}")
-    public ResponseEntity<Void> delete(@PathVariable Long id,
+    public ResponseEntity<Void> cancelarConsulta(@PathVariable Long id,
                                        @RequestBody MotivoCancelamento motivo) throws Exception {
         consultaService.cancelarConsulta(id, motivo);
         return ResponseEntity.noContent().build();

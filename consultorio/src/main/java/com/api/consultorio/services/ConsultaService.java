@@ -2,6 +2,7 @@ package com.api.consultorio.services;
 /*
     Classe responsável por Agendar e Cancelar consultas.
 */
+import com.api.consultorio.dtos.MedicoDTO;
 import com.api.consultorio.entities.consulta.MotivoCancelamento;
 import com.api.consultorio.services.validacoes.AgendamentoConsulta;
 import com.api.consultorio.dtos.ConsultaDTO;
@@ -12,8 +13,11 @@ import com.api.consultorio.repositories.ConsultaRepository;
 import com.api.consultorio.repositories.MedicoRepository;
 import com.api.consultorio.repositories.PacienteRepository;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
+import org.springframework.web.util.UriComponentsBuilder;
 
+import java.net.URI;
 import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Optional;
@@ -29,29 +33,54 @@ public class ConsultaService {
     PacienteRepository pacienteRepository;
     AgendamentoConsulta agendamentoConsulta = new AgendamentoConsulta();
 
-    public void agendarConsulta(ConsultaDTO consultaDTO) throws Exception {
+//    public void agendarConsulta(ConsultaDTO consultaDTO) throws Exception {
+//        validarExistenciaPaciente(consultaDTO);
+//
+//        Medico medico = escolherOuVerificarDisponibilidadeMedico(consultaDTO);
+//        Optional<Paciente> paciente = pacienteRepository.findById(consultaDTO.paciente().getId());
+//
+//        validarConsultasMarcadas(consultaDTO, medico);
+//        validarAtividadePacienteEMedico(paciente.get(), medico);
+//        validarDiaHoraConsulta(consultaDTO.dataHora());
+//
+//        Consulta consulta = new Consulta();
+//        consulta.setId(consultaDTO.id());
+//        consulta.setMedico(medico);
+//        consulta.setPaciente(consultaDTO.paciente());
+//        consulta.setDataHora(consultaDTO.dataHora());
+//
+//        consultaRepository.save(consulta);
+//    }
+
+    public ResponseEntity<ConsultaDTO> agendarConsulta(ConsultaDTO consultaDTO,
+                                                       UriComponentsBuilder uriBuilder) throws Exception {
         validarExistenciaPaciente(consultaDTO);
 
         Medico medico = escolherOuVerificarDisponibilidadeMedico(consultaDTO);
-        Optional<Paciente> paciente = pacienteRepository.findById(consultaDTO.paciente().getId());
+        // Inicia um optional com base no id recebido na requisição
+        Optional<Paciente> pacienteOptional = pacienteRepository.findById(consultaDTO.paciente().getId());
+        // Cria um objeto de Paciente para receber todos os dados...
+        Paciente paciente = pacienteOptional.get();
 
         validarConsultasMarcadas(consultaDTO, medico);
-        validarAtividadePacienteEMedico(paciente.get(), medico);
+        validarAtividadePacienteEMedico(paciente, medico);
         validarDiaHoraConsulta(consultaDTO.dataHora());
 
         Consulta consulta = new Consulta();
+
         consulta.setId(consultaDTO.id());
         consulta.setMedico(medico);
-        consulta.setPaciente(consultaDTO.paciente());
+        consulta.setPaciente(paciente);
         consulta.setDataHora(consultaDTO.dataHora());
 
+        URI uri = uriBuilder.path("/consultas/{id}").buildAndExpand(consulta.getId()).toUri();
         consultaRepository.save(consulta);
+        return ResponseEntity.created(uri).body(new ConsultaDTO(consulta));
     }
 
     private void validarExistenciaPaciente(ConsultaDTO consultaDTO) throws Exception {
-        Optional<Paciente> pacienteOptional = pacienteRepository.findById(consultaDTO.paciente().getId());
-        if (!pacienteOptional.isPresent()) {
-            throw new Exception("Paciente não encontrado na base de dados.");
+        if (consultaDTO.paciente() == null) {
+            throw new Exception("Não pode marcar uma consulta sem um paciente!");
         }
     }
 
