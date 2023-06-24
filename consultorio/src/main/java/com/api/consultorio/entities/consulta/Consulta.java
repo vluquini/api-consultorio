@@ -1,6 +1,5 @@
 package com.api.consultorio.entities.consulta;
 
-import com.api.consultorio.dtos.AgendarConsultaDTO;
 import com.api.consultorio.dtos.ConsultaDTO;
 import com.api.consultorio.entities.medico.Medico;
 import com.api.consultorio.entities.paciente.Paciente;
@@ -26,16 +25,20 @@ public class Consulta {
     @JoinColumn(name = "id_paciente")
     private Paciente paciente;
     private LocalDateTime dataHora;
-    /*
     @Column(name = "motivo_cancelamento")
     @Enumerated(EnumType.STRING)
-    private MotivoCancelamento motivoCancelamento; */
-    //private Boolean cancelada;
+    private MotivoCancelamento motivoCancelamento;
+    private Boolean cancelada;
 
 
     public Consulta (ConsultaDTO consultaDTO){
         this(consultaDTO.id(), consultaDTO.medico(), consultaDTO.paciente(),
-                consultaDTO.dataHora());
+                consultaDTO.dataHora(), null, false);
+    }
+
+    public void cancelarConsulta(MotivoCancelamento motivo){
+        this.motivoCancelamento = motivo;
+        this.cancelada = true;
     }
 
 }

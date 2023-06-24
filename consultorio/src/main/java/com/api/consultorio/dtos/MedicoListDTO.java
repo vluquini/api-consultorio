@@ -8,7 +8,7 @@ public record MedicoListDTO(
         String email,
         String crm,
         Especialidade especialidade,
-        Boolean ativo // remover isto depois
+        Boolean ativo
 ) {
     public MedicoListDTO(Medico medico){
         this(medico.getNome(), medico.getEmail(), medico.getCrm(), medico.getEspecialidade(),

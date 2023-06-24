@@ -1,7 +1,6 @@
 package com.api.consultorio.services.validacoes;
 
 import com.api.consultorio.dtos.ConsultaDTO;
-import com.api.consultorio.dtos.MedicoDTO;
 import com.api.consultorio.entities.consulta.Consulta;
 import com.api.consultorio.entities.medico.Medico;
 import com.api.consultorio.repositories.ConsultaRepository;
@@ -14,20 +13,20 @@ import java.util.Random;
 import java.util.stream.Collectors;
 
 
-public class ValidacoesDataConsulta {
+public class AgendamentoConsulta {
 
-    public static boolean isDiaUtil(LocalDateTime dataHora) {
+    public boolean isDiaUtil(LocalDateTime dataHora) {
         DayOfWeek diaSemana = dataHora.getDayOfWeek();
         // verifica se o dia está entre segunda e sábado
         return !diaSemana.equals(DayOfWeek.SUNDAY);
     }
-    public static boolean isHorarioPermitido(LocalDateTime dataHora) {
+    public boolean isHorarioPermitido(LocalDateTime dataHora) {
         LocalTime horario = dataHora.toLocalTime();
         // verifica se o horário está entre 7h e 19h
         return horario.isAfter(LocalTime.of(7, 0)) && horario.isBefore(LocalTime.of(19, 0));
     }
 
-    public static boolean validarHorarioDeAntecedencia(LocalDateTime dataHora){
+    public boolean validarHorarioDeAntecedencia(LocalDateTime dataHora){
         LocalDateTime horaAtual = LocalDateTime.now(ZoneId.systemDefault());
         // verifica se a consulta está sendo marcada com 30 min de antecedência
         return !dataHora.isBefore(horaAtual.plusMinutes(30));

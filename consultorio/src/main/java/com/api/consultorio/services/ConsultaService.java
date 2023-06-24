@@ -2,7 +2,8 @@ package com.api.consultorio.services;
 /*
     Classe responsável por Agendar e Cancelar consultas.
 */
-import com.api.consultorio.services.validacoes.ValidacoesDataConsulta;
+import com.api.consultorio.entities.consulta.MotivoCancelamento;
+import com.api.consultorio.services.validacoes.AgendamentoConsulta;
 import com.api.consultorio.dtos.ConsultaDTO;
 import com.api.consultorio.entities.consulta.Consulta;
 import com.api.consultorio.entities.medico.Medico;
@@ -26,7 +27,7 @@ public class ConsultaService {
     MedicoRepository medicoRepository;
     @Autowired
     PacienteRepository pacienteRepository;
-    ValidacoesDataConsulta validacoesDataConsulta = new ValidacoesDataConsulta();
+    AgendamentoConsulta agendamentoConsulta = new AgendamentoConsulta();
 
     public void agendarConsulta(ConsultaDTO consultaDTO) throws Exception {
         validarExistenciaPaciente(consultaDTO);
@@ -55,13 +56,13 @@ public class ConsultaService {
     }
 
     private Medico escolherOuVerificarDisponibilidadeMedico(ConsultaDTO consultaDTO) throws Exception {
-        ValidacoesDataConsulta validacoesDataConsulta = new ValidacoesDataConsulta();
+        AgendamentoConsulta agendamentoConsulta = new AgendamentoConsulta();
         Optional<Medico> medicoOptional;
         if (consultaDTO.medico() == null) {
-            medicoOptional = validacoesDataConsulta.escolherMedicoAleatorio(medicoRepository);
+            medicoOptional = agendamentoConsulta.escolherMedicoAleatorio(medicoRepository);
         } else {
             medicoOptional = medicoRepository.findById(consultaDTO.medico().getId());
-            if (validacoesDataConsulta.verificarMedicoConsultaMarcada(medicoOptional.get(), consultaDTO, consultaRepository)) {
+            if (agendamentoConsulta.verificarMedicoConsultaMarcada(medicoOptional.get(), consultaDTO, consultaRepository)) {
                 throw new Exception("Médico já possui consulta nesse horário!");
             }
         }
@@ -73,10 +74,10 @@ public class ConsultaService {
 
     private void validarConsultasMarcadas(ConsultaDTO consultaDTO, Medico medico) throws Exception {
         if(!consultaRepository.findAll().isEmpty()){
-            if (validacoesDataConsulta.validarDiaConsultaPaciente(consultaDTO, consultaRepository)) {
+            if (agendamentoConsulta.validarDiaConsultaPaciente(consultaDTO, consultaRepository)) {
                 throw new Exception("Não pode marcar consulta no mesmo dia para o mesmo paciente.");
             }
-            if (validacoesDataConsulta.verificarMedicoConsultaMarcada(medico, consultaDTO, consultaRepository)) {
+            if (agendamentoConsulta.verificarMedicoConsultaMarcada(medico, consultaDTO, consultaRepository)) {
                 throw new Exception("Médico já possui consulta nessa horario!");
             }
         }
@@ -92,20 +93,40 @@ public class ConsultaService {
     }
 
     private void validarDiaHoraConsulta(LocalDateTime dataHora) throws Exception {
-        if (!ValidacoesDataConsulta.isDiaUtil(dataHora)) {
+        if (!agendamentoConsulta.isDiaUtil(dataHora)) {
             throw new Exception("Dia inválido! A clínica não funciona aos domingos.");
         }
-        if (!ValidacoesDataConsulta.isHorarioPermitido(dataHora)) {
+        if (!agendamentoConsulta.isHorarioPermitido(dataHora)) {
             throw new Exception(("Só é possível marcar consultas entre 7h e 19h!"));
         }
-        if (!ValidacoesDataConsulta.validarHorarioDeAntecedencia(dataHora)) {
+        if (!agendamentoConsulta.validarHorarioDeAntecedencia(dataHora)) {
             throw new Exception("A consulta deve ser marcada com pelo menos 30 minutos de antecedência!");
         }
     }
 
+    public void cancelarConsulta(Long id, MotivoCancelamento motivo) throws Exception{
+        Optional<Consulta> consultaOptional = consultaRepository.findById(id);
+        if(consultaOptional.isPresent()){
+            Consulta consultaCancelada = consultaOptional.get();
+            consultaCancelada.cancelarConsulta(motivo);
+            consultaRepository.save(consultaCancelada);
+        }else
+            throw new Exception("Consulta não encontrada.");
+    }
+
+
     public List<ConsultaDTO> listarConsultas() throws Exception {
         if(!consultaRepository.findAll().isEmpty())
-            return consultaRepository.findAll().stream().map(ConsultaDTO::new).toList();
+            return consultaRepository.findAll().stream()
+                    .map(ConsultaDTO::new).toList();
+        throw new Exception("Não há consultas marcadas!");
+    }
+
+    public List<Consulta> listarConsultasCanceladas() throws Exception {
+        if(!consultaRepository.findAll().isEmpty())
+            return consultaRepository.findAll().stream()
+                    .filter(consulta -> consulta.getCancelada())
+                    .toList();
         throw new Exception("Não há consultas marcadas!");
     }
 
