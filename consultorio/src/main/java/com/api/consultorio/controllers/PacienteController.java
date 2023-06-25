@@ -4,6 +4,7 @@ import com.api.consultorio.dtos.PacienteDTO;
 import com.api.consultorio.dtos.PacienteListDTO;
 import com.api.consultorio.services.PacienteService;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -22,9 +23,16 @@ public class PacienteController {
     public ResponseEntity<PacienteDTO> cadastrar(@RequestBody PacienteDTO pacienteDTO, UriComponentsBuilder uriBuilder){
         return pacienteService.cadastrar(pacienteDTO, uriBuilder);
     }
+//    @GetMapping
+//    public List<PacienteListDTO> listar(){
+//        return pacienteService.listar();
+//    }
+
+
     @GetMapping
-    public List<PacienteListDTO> listar(){
-        return pacienteService.listar();
+    public ResponseEntity<Page<PacienteListDTO>> listarPacientes(@RequestParam(defaultValue = "0") int numeroPagina) {
+        Page<PacienteListDTO> paginaPacientes = pacienteService.listar(numeroPagina);
+        return ResponseEntity.ok(paginaPacientes);
     }
 
     @PutMapping("/{id}")

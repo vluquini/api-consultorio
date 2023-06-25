@@ -19,6 +19,7 @@ public record ConsultaDTO(
         @Future // valida data atual com uma posterior
         @NotBlank
         LocalDateTime dataHora
+        //Boolean cancelada
        //MotivoCancelamento motivoCancelamento
        //Especialidade especialidade
 ) {

@@ -6,12 +6,17 @@ import com.api.consultorio.entities.medico.Medico;
 import com.api.consultorio.repositories.MedicoRepository;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageImpl;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 import org.springframework.web.util.UriComponentsBuilder;
 
 import java.net.URI;
+import java.util.Comparator;
 import java.util.List;
 import java.util.Optional;
 
@@ -28,25 +33,32 @@ public class MedicoService {
         return ResponseEntity.created(uri).body(new MedicoDTO(medico));
     }
 
-    // este método retorna apenas os dados necessários dos médicos, usando a classe "MedicoResponseDTO".
-    public List<MedicoListDTO> listar() {
-        /*
-        if (nome != null && !(nome.equalsIgnoreCase(""))) {
-            // retorna os elementos que possuirem o mesmo nome
-            return medicoRepository.findAll().stream()
-                    .filter(medico -> medico.getNome().equalsIgnoreCase(nome) && medico.isAtivo() == true)
-                    .map(MedicoListDTO::new)
-                    .toList();
-        }
-        */
-        // retorna todos os elementos ordenados pelo nome
-        return medicoRepository.findAll().stream()
-                // filtra apenas os médicos "ativos"
-                .filter(medico -> medico.getAtivo() == true)
-                .sorted((m1, m2) -> m1.getNome()
-                .compareToIgnoreCase(m2.getNome())).map(MedicoListDTO::new).toList();
-    }
+    // este método retorna apenas os dados necessários dos médicos, usando a classe "MedicoListDTO".
+//    public List<MedicoListDTO> listar() {
+//        // retorna todos os elementos ordenados pelo nome
+//        return medicoRepository.findAll().stream()
+//                // filtra apenas os médicos "ativos"
+//                .filter(medico -> medico.getAtivo() == true)
+//                .sorted((m1, m2) -> m1.getNome()
+//                .compareToIgnoreCase(m2.getNome())).map(MedicoListDTO::new).toList();
+//    }
 
+    public Page<MedicoListDTO> listar(int numeroPagina) {
+        int registrosPorPagina = 10;
+        // Define a página desejada (baseada no número de página recebido)
+        Pageable pageable = PageRequest.of(numeroPagina, registrosPorPagina);
+        // Realiza a consulta paginada
+        Page<Medico> paginaMedicos = medicoRepository.findAll(pageable);
+
+        List<MedicoListDTO> medicoListDTOs = paginaMedicos.stream()
+                .filter(medico -> medico.getAtivo())
+                .sorted(Comparator.comparing(Medico::getNome, String.CASE_INSENSITIVE_ORDER))
+                .map(MedicoListDTO::new)
+                .toList();
+
+        // Retorna a página de médicos
+        return new PageImpl<>(medicoListDTOs, pageable, paginaMedicos.getTotalElements());
+    }
     /*
     Este método atualiza apenas os campos "nome" e "telefone", ignorando
     os demais parâmetros que possam ser passados na requisição.

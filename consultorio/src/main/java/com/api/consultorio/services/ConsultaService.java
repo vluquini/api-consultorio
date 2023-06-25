@@ -33,25 +33,6 @@ public class ConsultaService {
     PacienteRepository pacienteRepository;
     AgendamentoConsulta agendamentoConsulta = new AgendamentoConsulta();
 
-//    public void agendarConsulta(ConsultaDTO consultaDTO) throws Exception {
-//        validarExistenciaPaciente(consultaDTO);
-//
-//        Medico medico = escolherOuVerificarDisponibilidadeMedico(consultaDTO);
-//        Optional<Paciente> paciente = pacienteRepository.findById(consultaDTO.paciente().getId());
-//
-//        validarConsultasMarcadas(consultaDTO, medico);
-//        validarAtividadePacienteEMedico(paciente.get(), medico);
-//        validarDiaHoraConsulta(consultaDTO.dataHora());
-//
-//        Consulta consulta = new Consulta();
-//        consulta.setId(consultaDTO.id());
-//        consulta.setMedico(medico);
-//        consulta.setPaciente(consultaDTO.paciente());
-//        consulta.setDataHora(consultaDTO.dataHora());
-//
-//        consultaRepository.save(consulta);
-//    }
-
     public ResponseEntity<ConsultaDTO> agendarConsulta(ConsultaDTO consultaDTO,
                                                        UriComponentsBuilder uriBuilder) throws Exception {
         validarExistenciaPaciente(consultaDTO);
