@@ -12,15 +12,20 @@ import com.api.consultorio.entities.paciente.Paciente;
 import com.api.consultorio.repositories.ConsultaRepository;
 import com.api.consultorio.repositories.MedicoRepository;
 import com.api.consultorio.repositories.PacienteRepository;
+import com.api.consultorio.services.validacoes.CancelamentoConsulta;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.cglib.core.Local;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 import org.springframework.web.util.UriComponentsBuilder;
 
 import java.net.URI;
+import java.time.Duration;
 import java.time.LocalDateTime;
+import java.time.ZoneId;
 import java.util.List;
 import java.util.Optional;
+import java.util.stream.Collectors;
 
 
 @Service
@@ -32,6 +37,7 @@ public class ConsultaService {
     @Autowired
     PacienteRepository pacienteRepository;
     AgendamentoConsulta agendamentoConsulta = new AgendamentoConsulta();
+    CancelamentoConsulta cancelamentoConsulta = new CancelamentoConsulta();
 
     public ResponseEntity<ConsultaDTO> agendarConsulta(ConsultaDTO consultaDTO,
                                                        UriComponentsBuilder uriBuilder) throws Exception {
@@ -53,19 +59,20 @@ public class ConsultaService {
         consulta.setMedico(medico);
         consulta.setPaciente(paciente);
         consulta.setDataHora(consultaDTO.dataHora());
+        consulta.setCancelada(false);
 
         URI uri = uriBuilder.path("/consultas/{id}").buildAndExpand(consulta.getId()).toUri();
         consultaRepository.save(consulta);
         return ResponseEntity.created(uri).body(new ConsultaDTO(consulta));
     }
 
-    private void validarExistenciaPaciente(ConsultaDTO consultaDTO) throws Exception {
+    public void validarExistenciaPaciente(ConsultaDTO consultaDTO) throws Exception {
         if (consultaDTO.paciente() == null) {
             throw new Exception("Não pode marcar uma consulta sem um paciente!");
         }
     }
 
-    private Medico escolherOuVerificarDisponibilidadeMedico(ConsultaDTO consultaDTO) throws Exception {
+    public Medico escolherOuVerificarDisponibilidadeMedico(ConsultaDTO consultaDTO) throws Exception {
         AgendamentoConsulta agendamentoConsulta = new AgendamentoConsulta();
         Optional<Medico> medicoOptional;
         if (consultaDTO.medico() == null) {
@@ -82,7 +89,7 @@ public class ConsultaService {
         return medicoOptional.get();
     }
 
-    private void validarConsultasMarcadas(ConsultaDTO consultaDTO, Medico medico) throws Exception {
+    public void validarConsultasMarcadas(ConsultaDTO consultaDTO, Medico medico) throws Exception {
         if(!consultaRepository.findAll().isEmpty()){
             if (agendamentoConsulta.validarDiaConsultaPaciente(consultaDTO, consultaRepository)) {
                 throw new Exception("Não pode marcar consulta no mesmo dia para o mesmo paciente.");
@@ -93,7 +100,7 @@ public class ConsultaService {
         }
     }
 
-    private void validarAtividadePacienteEMedico(Paciente paciente, Medico medico) throws Exception {
+    public void validarAtividadePacienteEMedico(Paciente paciente, Medico medico) throws Exception {
         if (!paciente.getAtivo()) {
             throw new Exception("Não é possível marcar consultas com pacientes inativos no sistema!");
         }
@@ -102,7 +109,7 @@ public class ConsultaService {
         }
     }
 
-    private void validarDiaHoraConsulta(LocalDateTime dataHora) throws Exception {
+    public void validarDiaHoraConsulta(LocalDateTime dataHora) throws Exception {
         if (!agendamentoConsulta.isDiaUtil(dataHora)) {
             throw new Exception("Dia inválido! A clínica não funciona aos domingos.");
         }
@@ -114,24 +121,65 @@ public class ConsultaService {
         }
     }
 
+//    public void cancelarConsulta(Long id, MotivoCancelamento motivo) throws Exception{
+//
+//        Optional<Consulta> consultaOptional = consultaRepository.findById(id);
+//        if(consultaOptional.isPresent()){
+//            Consulta consultaCancelada = consultaOptional.get();
+//            consultaCancelada.cancelarConsulta(motivo);
+//            consultaRepository.save(consultaCancelada);
+//        }else
+//            throw new Exception("Consulta não encontrada.");
+//    }
+
     public void cancelarConsulta(Long id, MotivoCancelamento motivo) throws Exception{
+        if(!cancelamentoConsulta.verificarMotivo(motivo))
+            throw new Exception("É necessário informar o motivo do cancelamento!");
+
+        if(id == null)
+            throw new Exception("É necessário informar o id da consulta a ser cancelada!");
+
+        // Inicia um objeto com o horário atual do sistema
+        LocalDateTime horaAtual = LocalDateTime.now();
+
         Optional<Consulta> consultaOptional = consultaRepository.findById(id);
-        if(consultaOptional.isPresent()){
+        if (consultaOptional.isPresent()) {
             Consulta consultaCancelada = consultaOptional.get();
+
+            LocalDateTime horarioConsulta = consultaCancelada.getDataHora();
+
+            // Calcula a diferença entre as duas datas
+            Duration diferenca = Duration.between(horaAtual, horarioConsulta);
+
+            // Verifica se a diferença é menor que 24 horas
+            if (diferenca.toHours() < 24) {
+                throw new Exception("A consulta deve ser cancelada com antecedência mínima de 24 horas.");
+            }
+
             consultaCancelada.cancelarConsulta(motivo);
             consultaRepository.save(consultaCancelada);
-        }else
+        } else {
             throw new Exception("Consulta não encontrada.");
+        }
     }
 
+//    public List<ConsultaDTO> listarConsultas() throws Exception {
+//        if(!consultaRepository.findAll().isEmpty())
+//            return consultaRepository.findAll().stream()
+//                    .map(ConsultaDTO::new).toList();
+//        throw new Exception("Não há consultas marcadas!");
+//    }
 
     public List<ConsultaDTO> listarConsultas() throws Exception {
-        if(!consultaRepository.findAll().isEmpty())
-            return consultaRepository.findAll().stream()
-                    .map(ConsultaDTO::new).toList();
+        // Lista apenas as consultas com status cancelado "falso"
+        List<ConsultaDTO> consultas = consultaRepository.findAll().stream()
+                .filter(consulta -> !consulta.getCancelada()).map(ConsultaDTO::new)
+                .collect(Collectors.toList());
+        if (!consultas.isEmpty()) {
+            return consultas;
+        }
         throw new Exception("Não há consultas marcadas!");
     }
-
     public List<Consulta> listarConsultasCanceladas() throws Exception {
         if(!consultaRepository.findAll().isEmpty())
             return consultaRepository.findAll().stream()

@@ -37,7 +37,8 @@ public class AgendamentoConsulta {
         List<Consulta> listaConsultas = consultaRepository.findAll();
 
         for (Consulta consulta : listaConsultas) {
-            if (consulta.getPaciente().getId() == consultaDTO.paciente().getId()) {
+            // Verifica apenas as consultas no mesmo dia com status de cancelada igual a "false"
+            if (consulta.getPaciente().getId() == consultaDTO.paciente().getId() && !consulta.getCancelada()) {
                 LocalDateTime dataHoraConsulta = consulta.getDataHora();
                 LocalDate dataConsulta = dataHoraConsulta.toLocalDate();
                 LocalDate dataConsultaDTO = consultaDTO.dataHora().toLocalDate();
@@ -67,9 +68,15 @@ public class AgendamentoConsulta {
         }
     //}
     // Verifica se o medico já possui uma consulta marcada para este horário
+//    public boolean verificarMedicoConsultaMarcada(Medico medico, ConsultaDTO consultaDTO,
+//                                                  ConsultaRepository consultaRepository){
+//        return consultaRepository.existsByMedicoAndDataHora(medico,
+//                consultaDTO.dataHora());
+//    }
+
     public boolean verificarMedicoConsultaMarcada(Medico medico, ConsultaDTO consultaDTO,
                                                   ConsultaRepository consultaRepository){
-        return consultaRepository.existsByMedicoAndDataHora(medico,
+        return consultaRepository.existsByMedicoAndDataHoraAndCanceladaFalse(medico,
                 consultaDTO.dataHora());
     }
 

@@ -18,14 +18,14 @@ public record ConsultaDTO(
         Paciente paciente,
         @Future // valida data atual com uma posterior
         @NotBlank
-        LocalDateTime dataHora
-        //Boolean cancelada
+        LocalDateTime dataHora,
+        Boolean cancelada
        //MotivoCancelamento motivoCancelamento
        //Especialidade especialidade
 ) {
         public ConsultaDTO(Consulta consulta){
                 this(consulta.getId(), consulta.getMedico(), consulta.getPaciente(),
-                        consulta.getDataHora());
+                        consulta.getDataHora(), false);
         }
 
 }
