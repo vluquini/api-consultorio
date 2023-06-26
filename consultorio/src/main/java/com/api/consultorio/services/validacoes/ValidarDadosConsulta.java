@@ -12,8 +12,12 @@ import java.util.Optional;
 import java.util.Random;
 import java.util.stream.Collectors;
 
-
-public class AgendamentoConsulta {
+/*
+Esta classe contém métodos que validam os dados
+para o agendamento de uma consulta. Os métodos desta
+classe são chamados na classe "ValidarConsulta".
+ */
+public class ValidarDadosConsulta {
 
     public boolean isDiaUtil(LocalDateTime dataHora) {
         DayOfWeek diaSemana = dataHora.getDayOfWeek();
