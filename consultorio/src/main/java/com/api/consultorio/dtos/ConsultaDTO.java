@@ -20,7 +20,6 @@ public record ConsultaDTO(
         @NotBlank
         LocalDateTime dataHora,
         Boolean cancelada
-       //MotivoCancelamento motivoCancelamento
        //Especialidade especialidade
 ) {
         public ConsultaDTO(Consulta consulta){

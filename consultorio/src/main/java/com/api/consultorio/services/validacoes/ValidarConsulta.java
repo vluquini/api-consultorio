@@ -22,6 +22,9 @@ public class ValidarConsulta {
 
     public Medico escolherOuVerificarDisponibilidadeMedico(ConsultaDTO consultaDTO, MedicoRepository medicoRepository,
                                                            ConsultaRepository consultaRepository) throws Exception {
+        if(medicoRepository.findAll().isEmpty())
+            throw new Exception("Não há médicos na base de dados!");
+
         ValidarDadosConsulta validarDadosConsulta = new ValidarDadosConsulta();
         Optional<Medico> medicoOptional;
         if (consultaDTO.medico() == null) {

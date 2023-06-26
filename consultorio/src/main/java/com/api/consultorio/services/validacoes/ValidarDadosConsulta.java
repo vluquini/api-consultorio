@@ -58,25 +58,18 @@ public class ValidarDadosConsulta {
     public Optional<Medico> escolherMedicoAleatorio(MedicoRepository medicoRepository) {
         // Cria uma lista com todos os médicos "ativos" cadastrados.
         List<Medico> medicosDisponiveis = medicoRepository.findAll().stream()
-                .filter(medico -> medico.getAtivo())
-                .collect(Collectors.toList());
-        /*
-        if (medicosDisponiveis.isEmpty()) {
-            throw new RuntimeException("Não há médicos cadastrados no sistema.");
-        }else{ */
+                .filter(Medico::getAtivo)
+                .toList();
+//       List<Medico> medicosDisponiveis = medicoRepository.findAll().stream()
+//              .filter(medico -> medico.getAtivo())
+//              .collect(Collectors.toList());
+
             Random random = new Random();
             long id = random.nextInt(medicosDisponiveis.size());
             Optional<Medico> medicoOptional = medicoRepository.findById(medicosDisponiveis.get((int) id).getId());
             return medicoOptional;
 
-        }
-    //}
-    // Verifica se o medico já possui uma consulta marcada para este horário
-//    public boolean verificarMedicoConsultaMarcada(Medico medico, ConsultaDTO consultaDTO,
-//                                                  ConsultaRepository consultaRepository){
-//        return consultaRepository.existsByMedicoAndDataHora(medico,
-//                consultaDTO.dataHora());
-//    }
+    }
 
     public boolean verificarMedicoConsultaMarcada(Medico medico, ConsultaDTO consultaDTO,
                                                   ConsultaRepository consultaRepository){
@@ -84,16 +77,12 @@ public class ValidarDadosConsulta {
                 consultaDTO.dataHora());
     }
 
-    //    public boolean validarDiaConsultaMedico(ConsultaDTO consultaDTO, ConsultaRepository consultaRepository){
-//        List<Consulta> listaConsultas = consultaRepository.findAll();
-//        int i = 0;
-//        while (listaConsultas != null){
-//            if(listaConsultas.get(i).getMedico().getId() == consultaDTO.medico().getId()){
-//                return listaConsultas.get(i).getDataHora() == consultaDTO.dataHora();
-//            }
-//            i++;
-//        }
-//        return false;
+    // Verifica se o medico já possui uma consulta marcada para este horário
+//    public boolean verificarMedicoConsultaMarcada(Medico medico, ConsultaDTO consultaDTO,
+//                                                  ConsultaRepository consultaRepository){
+//        return consultaRepository.existsByMedicoAndDataHora(medico,
+//                consultaDTO.dataHora());
 //    }
+
 
 }
