@@ -3,6 +3,7 @@ package com.api.consultorio.controllers;
 import com.api.consultorio.dtos.PacienteDTO;
 import com.api.consultorio.dtos.PacienteListDTO;
 import com.api.consultorio.services.PacienteService;
+import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.http.HttpStatus;
@@ -20,14 +21,13 @@ public class PacienteController {
 
     @PostMapping
     @ResponseStatus(HttpStatus.CREATED)
-    public ResponseEntity<PacienteDTO> cadastrar(@RequestBody PacienteDTO pacienteDTO, UriComponentsBuilder uriBuilder){
+    public ResponseEntity<PacienteDTO> cadastrar(@RequestBody @Valid PacienteDTO pacienteDTO, UriComponentsBuilder uriBuilder){
         return pacienteService.cadastrar(pacienteDTO, uriBuilder);
     }
 //    @GetMapping
 //    public List<PacienteListDTO> listar(){
 //        return pacienteService.listar();
 //    }
-
 
     @GetMapping
     public ResponseEntity<Page<PacienteListDTO>> listarPacientes(@RequestParam(defaultValue = "0") int numeroPagina) {

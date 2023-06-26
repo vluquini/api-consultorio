@@ -96,7 +96,7 @@ public class PacienteService {
             ResponseEntity<PacienteDTO> response = new ResponseEntity<>(new PacienteDTO(
                     paciente.getId(), paciente.getNome(), paciente.getEmail(), paciente.getTelefone(),
                     paciente.getCpf(), paciente.getEndereco(), paciente.getAtivo()), HttpStatus.OK);
-            // salvo a nova instância atualizada
+            // salva a nova instância atualizada
             pacienteRepository.save(paciente);
             return response;
         }

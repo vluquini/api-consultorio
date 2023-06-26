@@ -26,12 +26,28 @@ public class MedicoService {
     MedicoRepository medicoRepository;
 
     // para cadastrar um novo medico, todos os dados devem ser preenchidos na requisição
-    public ResponseEntity<MedicoDTO> cadastrar(MedicoDTO medicoDTO, UriComponentsBuilder uriBuilder){
+    public ResponseEntity<MedicoDTO> cadastrar(MedicoDTO medicoDTO, UriComponentsBuilder uriBuilder) throws Exception {
+        if(!enderecoVazio(medicoDTO)){
+            throw new Exception("Somente 'numero' e 'complemento' do endereço podem ser vazios!");
+        }
+
         Medico medico = new Medico(medicoDTO);
         URI uri = uriBuilder.path("/medicos/{id}").buildAndExpand(medico.getId()).toUri();
         medicoRepository.save(medico);
         return ResponseEntity.created(uri).body(new MedicoDTO(medico));
     }
+
+    public boolean enderecoVazio(MedicoDTO medicoDTO) {
+        if (medicoDTO.endereco().getLogradouro().isBlank() ||
+            medicoDTO.endereco().getNumero().isBlank() ||
+            medicoDTO.endereco().getBairro().isBlank() ||
+            medicoDTO.endereco().getCidade().isBlank() ||
+            medicoDTO.endereco().getUf().isBlank() || medicoDTO.endereco().getCep().isBlank()) {
+            return false;
+        }
+        return true;
+    }
+
 
     // este método retorna apenas os dados necessários dos médicos, usando a classe "MedicoListDTO".
 //    public List<MedicoListDTO> listar() {
@@ -101,7 +117,7 @@ public class MedicoService {
             ResponseEntity<MedicoDTO> response = new ResponseEntity<MedicoDTO>(new MedicoDTO(
                     medico.getId(), medico.getNome(), medico.getEmail(), medico.getTelefone(), medico.getCrm(),
                     medico.getEspecialidade(), medico.getEndereco(), medico.getAtivo()), HttpStatus.OK);
-            // salvo a nova instância atualizada
+            // salva a nova instância atualizada
             medicoRepository.save(medico);
             return response;
         }

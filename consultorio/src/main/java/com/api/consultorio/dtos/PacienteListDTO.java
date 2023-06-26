@@ -6,7 +6,7 @@ public record PacienteListDTO(
         String nome,
         String email,
         String cpf,
-        Boolean ativo // remover isto depois
+        Boolean ativo
 ) {
     public PacienteListDTO(Paciente paciente){
         this(paciente.getNome(), paciente.getEmail(), paciente.getCpf(),paciente.getAtivo());

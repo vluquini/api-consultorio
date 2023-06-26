@@ -3,6 +3,7 @@ package com.api.consultorio.controllers;
 import com.api.consultorio.dtos.MedicoDTO;
 import com.api.consultorio.dtos.MedicoListDTO;
 import com.api.consultorio.services.MedicoService;
+import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.http.HttpStatus;
@@ -20,7 +21,8 @@ public class MedicoController {
 
     @PostMapping
     @ResponseStatus(HttpStatus.CREATED)
-    public ResponseEntity<MedicoDTO> cadastrar(@RequestBody MedicoDTO medicoDTO, UriComponentsBuilder uriBuilder){
+    public ResponseEntity<MedicoDTO> cadastrar(@RequestBody @Valid MedicoDTO medicoDTO,
+                                               UriComponentsBuilder uriBuilder) throws Exception {
         return medicoService.cadastrar(medicoDTO, uriBuilder);
     }
 

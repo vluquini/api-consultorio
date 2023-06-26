@@ -12,9 +12,9 @@ public record MedicoDTO(
         @NotBlank String email,
         @NotBlank String telefone,
         @NotBlank String crm,
-        @NotBlank Especialidade especialidade,
-        @NotBlank Endereco endereco,
-        @NotBlank Boolean ativo
+        @NotNull Especialidade especialidade,
+        @NotNull Endereco endereco,
+        Boolean ativo
 ) {
     public MedicoDTO(Medico medico){
         this(medico.getId(), medico.getNome(), medico.getEmail(),

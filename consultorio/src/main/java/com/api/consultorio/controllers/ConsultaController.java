@@ -23,7 +23,6 @@ public class ConsultaController {
     public ResponseEntity<ConsultaDTO> agendarConsulta(@RequestBody ConsultaDTO consultaDTO,
                                                        UriComponentsBuilder uriBuilder) throws Exception {
          return consultaService.agendarConsulta(consultaDTO, uriBuilder);
-
     }
 
     @DeleteMapping("/{id}")

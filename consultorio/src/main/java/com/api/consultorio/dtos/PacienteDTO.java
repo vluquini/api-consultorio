@@ -11,8 +11,8 @@ public record PacienteDTO(
         @NotBlank String email,
         @NotBlank String telefone,
         @NotBlank String cpf,
-        @NotBlank Endereco endereco,
-        @NotBlank Boolean ativo
+        @NotNull Endereco endereco,
+        Boolean ativo
 ) {
     public PacienteDTO(Paciente paciente){
         this(paciente.getId(), paciente.getNome(), paciente.getEmail(), paciente.getTelefone(),
